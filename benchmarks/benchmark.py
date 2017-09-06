@@ -36,7 +36,8 @@ def requests_benchmark():
     start = time.time()
 
     for _ in range(number_or_repetitions):
-        [requests.get(url) for url in urls]
+        for url in urls:
+            requests.get(url)
 
     print('Average elapsed time requests = {}'.format(
         (time.time() - start)/number_or_repetitions))
@@ -59,9 +60,9 @@ async def asyncio_benchmark():
     for _ in range(number_or_repetitions):
         futures = [loop.run_in_executor(None, requests.get, url)
                    for url in urls]
-        responses = []
+
         for future in futures:
-            responses.append(await future)
+            await future
     print('Average elapsed time asyncio = {}'.format(
         (time.time() - start) / number_or_repetitions))
 
