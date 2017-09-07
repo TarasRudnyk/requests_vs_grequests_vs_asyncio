@@ -3,6 +3,7 @@ import time
 
 import grequests
 import requests
+from requests_threads import AsyncSession
 
 from benchmarks.private_settings import APP_ID, APP_SECRET
 
@@ -67,9 +68,22 @@ async def asyncio_benchmark():
         (time.time() - start) / number_or_repetitions))
 
 
+async def requests_threads_benchmark():
+    start = time.time()
+    for _ in range(number_or_repetitions):
+        for url in urls:
+            await session.get(url)
+
+    print('Average elapsed time requests_threads = {}'.format(
+        (time.time() - start) / number_or_repetitions))
+
+
 if __name__ == '__main__':
     requests_benchmark()
     grequests_benchmark()
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(asyncio_benchmark())
+
+    session = AsyncSession(n=100)
+    session.run(requests_threads_benchmark)
